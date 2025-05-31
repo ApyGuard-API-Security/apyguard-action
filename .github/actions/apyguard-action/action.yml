@@ -1,0 +1,16 @@
+name: 'ApyGuard API Security Scanner'
+description: 'Scan APIs for security issues using ApyGuard'
+inputs:
+  api_key:
+    description: 'ApyGuard API token'
+    required: true
+  task_id:
+    description: 'Task ID from ApyGuard platform'
+    required: true
+  
+runs:
+  using: 'docker'
+  image: 'docker://apyguard/apyguard-scanner:latest'
+  args:
+    - ${{ inputs.api_key }}
+    - ${{ inputs.task_id }}
