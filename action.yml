@@ -10,7 +10,7 @@ inputs:
   
 runs:
   using: 'docker'
-  image: 'docker://apyguard/apyguard-scanner:latest'
+  image: 'ghcr.io/apyguard-api-security/apyguard-scanner:latest'
   args:
     - ${{ inputs.api_key }}
     - ${{ inputs.task_id }}
