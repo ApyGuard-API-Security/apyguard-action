@@ -8,7 +8,7 @@ ApyGuard is an automated API security scanner that checks your API endpoints for
 
 ## 📦 How This Action Works
 
-This GitHub Action uses the ApyGuard Docker scanner to scan your **running API server** after code changes.
+This GitHub Action uses the ApyGuard API to scan your **running API server** after code changes. The scan is performed remotely through the ApyGuard API service.
 
 ## 🛠️ Usage
 
@@ -28,4 +28,20 @@ jobs:
         uses: apyguard/apyguard-action@v1
         with:
           api_key: ${{ secrets.APYGUARD_API_KEY }}
-          task_id: "your-task-id"
+          task_id: "ApyGuard-Task-ID"
+          api_url: "https://api.apyguard.com/v1"  # Optional, defaults to production URL
+```
+
+## 📝 Inputs
+
+| Input | Required | Description |
+|-------|----------|-------------|
+| api_key | Yes | Your ApyGuard API token |
+| task_id | Yes | The task ID from ApyGuard platform |
+| api_url | No | Custom API endpoint URL (defaults to production) |
+
+## 📤 Outputs
+
+| Output | Description |
+|--------|-------------|
+| results | JSON string containing the scan results |

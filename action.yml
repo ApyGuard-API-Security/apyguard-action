@@ -7,10 +7,11 @@ inputs:
   task_id:
     description: 'Task ID from ApyGuard platform'
     required: true
+  api_url:
+    description: 'ApyGuard API endpoint URL'
+    required: true
+    default: 'https://api.apyguard.com/v1'
   
 runs:
-  using: 'docker'
-  image: 'ghcr.io/apyguard-api-security/apyguard-scanner:latest'
-  args:
-    - ${{ inputs.api_key }}
-    - ${{ inputs.task_id }}
+  using: 'node16'
+  main: 'dist/index.js'
