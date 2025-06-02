@@ -57,13 +57,16 @@ function run() {
             const client = axios_1.default.create({
                 baseURL: apiUrl,
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`,
+                    'X-APYGUARD-TOKEN': `${apiKey}`,
                     'Content-Type': 'application/json'
                 }
             });
+            const body = {
+                "scan_task_id": taskId
+            };
             // Start the scan
             core.info('🚀 Starting ApyGuard scan...');
-            const startResponse = yield client.post(`/tasks/${taskId}/start`);
+            const startResponse = yield client.post(`api/api_security/start_github_api_scan`, body);
             if (startResponse.status !== 200) {
                 throw new Error('Failed to start scan');
             }
