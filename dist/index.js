@@ -68,7 +68,7 @@ function run() {
             core.info('🚀 Starting ApyGuard scan...');
             const startResponse = yield client.post(`api/api_security/start_github_api_scan`, body);
             if (startResponse.status !== 200) {
-                throw new Error('Failed to start scan');
+                throw new Error(`Failed to start scan: ${startResponse.status} ${startResponse.statusText}`);
             }
             // Poll for results
             let scanComplete = false;
