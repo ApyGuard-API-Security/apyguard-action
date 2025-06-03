@@ -30,6 +30,7 @@ jobs:
           api_key: ${{ secrets.APYGUARD_API_KEY }}
           task_id: "ApyGuard-Task-ID"
           api_url: "https://api.apyguard.com/v1"  # Optional, defaults to production URL
+          severity_threshold: "Medium" # Optional, default value "Medium"
 ```
 
 ## 📝 Inputs
