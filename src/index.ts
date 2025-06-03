@@ -72,9 +72,9 @@ async function run() {
 
         // Set success/failure based on findings
         if (vulnerability_count > 0) {
-          core.setFailed(`🚨 ${vulnerability_count} security vulnerabilities found with severity ${severityThreshold} or higher`);
+          core.setFailed(`🚨 ${vulnerability_count} security vulnerabilities found with severity ${severityThreshold} or higher. Total vulnerabilities: ${vulnerability_count}`);
         } else {
-          core.info(`✅ No security vulnerabilities found with severity ${severityThreshold} or higher`);
+          core.info(`✅ No security vulnerabilities found with severity ${severityThreshold} or higher. Total vulnerabilities: ${vulnerability_count}`);
         }
       } else if (statusResponse.data.status === 'failed') {
         throw new Error('Scan failed: ' + statusResponse.data.error);
