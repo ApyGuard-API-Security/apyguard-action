@@ -11,6 +11,10 @@ inputs:
     description: 'ApyGuard API endpoint URL'
     required: true
     default: 'https://api.apyguard.com/v1'
+  severity_threshold:
+    description: 'Severity threshold for the scan. Options are Critical, High, Medium, Low, Informational'
+    required: true
+    default: 'Medium'
   
 runs:
   using: 'node16'

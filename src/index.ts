@@ -6,6 +6,22 @@ async function run() {
     const apiKey = core.getInput('api_key');
     const taskId = core.getInput('task_id');
     const apiUrl = core.getInput('api_url');
+    const severityThreshold = core.getInput('severity_threshold');
+
+    // Define severity levels and their numeric values
+    const severityLevels = {
+      'Critical': 4,
+      'High': 3,
+      'Medium': 2,
+      'Low': 1,
+      'Informational': 0
+    };
+
+    // Get the numeric threshold value
+    const thresholdValue = severityLevels[severityThreshold as keyof typeof severityLevels];
+    if (thresholdValue === undefined) {
+      throw new Error(`Invalid severity threshold: ${severityThreshold}. Must be one of: ${Object.keys(severityLevels).join(', ')}`);
+    }
 
     // Initialize API client
     const client = axios.create({
@@ -22,27 +38,43 @@ async function run() {
 
     // Start the scan
     core.info('🚀 Starting ApyGuard scan...');
-    const startResponse = await client.post('api/api_security/start_github_api_scan', body);
+    const startResponse = await client.post('api/api_security/github_actions/start_scan', body);
     if (startResponse.status !== 200) {
       throw new Error(`Failed to start scan: ${startResponse.status} ${startResponse.statusText}`);
+    }
+    else{
+      core.info('🚀 Scan started successfully. Scan ID: ' + startResponse.data.apiscan_id);
     }
 
     // Poll for results
     let scanComplete = false;
     while (!scanComplete) {
-      const statusResponse = await client.get(`/tasks/${taskId}/status`);
+      const body = {
+        apiscan_id: startResponse.data.apiscan_id
+      };
+      const statusResponse = await client.post(`/api/api_security/integrations/get_scan_status`, body);
       
-      if (statusResponse.data.status === 'completed') {
+      if (statusResponse.data.status === 'Completed') {
         scanComplete = true;
         core.info('✅ Scan completed successfully');
         
         // Get scan results
-        const resultsResponse = await client.get(`/tasks/${taskId}/results`);
-        core.setOutput('results', JSON.stringify(resultsResponse.data));
+        const resultsResponse = await client.post(`/api/api_security/integrations/get_scan_results`, body);
+        core.setOutput('Scan Results', JSON.stringify(resultsResponse.data.vulnerabilities));
         
+        // Count only vulnerabilities that meet or exceed the threshold
+        let vulnerability_count = 0;
+        for (const [severity, count] of Object.entries(resultsResponse.data.vulnerabilities)) {
+          if (severityLevels[severity as keyof typeof severityLevels] >= thresholdValue) {
+            vulnerability_count += Number(count);
+          }
+        }
+
         // Set success/failure based on findings
-        if (resultsResponse.data.findings.length > 0) {
-          core.setFailed('Security vulnerabilities found');
+        if (vulnerability_count > 0) {
+          core.setFailed(`🚨 ${vulnerability_count} security vulnerabilities found with severity ${severityThreshold} or higher`);
+        } else {
+          core.info(`✅ No security vulnerabilities found with severity ${severityThreshold} or higher`);
         }
       } else if (statusResponse.data.status === 'failed') {
         throw new Error('Scan failed: ' + statusResponse.data.error);
