@@ -61,20 +61,31 @@ async function run() {
         // Get scan results
         const resultsResponse = await client.post(`/api/api_security/integrations/get_scan_results`, body);
         core.setOutput('Scan Results', JSON.stringify(resultsResponse.data.vulnerabilities));
-        core.info('Scan Results: ' + JSON.stringify(resultsResponse.data.vulnerabilities));
+        
         // Count only vulnerabilities that meet or exceed the threshold
         let vulnerability_count = 0;
-        for (const [severity, count] of Object.entries(resultsResponse.data.vulnerabilities)) {
-          if (severityLevels[severity as keyof typeof severityLevels] >= thresholdValue) {
-            vulnerability_count += Number(count);
+        const vulnerabilities = resultsResponse.data.vulnerabilities;
+        
+        // Debug log to see what we're working with
+        core.info(`Current severity threshold: ${severityThreshold} (value: ${thresholdValue})`);
+        core.info(`Vulnerabilities found: ${JSON.stringify(vulnerabilities)}`);
+
+        // Count vulnerabilities that meet or exceed threshold
+        for (const [severity, count] of Object.entries(vulnerabilities)) {
+          const severityValue = severityLevels[severity as keyof typeof severityLevels];
+          if (severityValue >= thresholdValue) {
+            vulnerability_count += Number(count); // Ensure we're adding numbers
           }
         }
 
+        // Debug log the final count
+        core.info(`Total vulnerabilities meeting threshold: ${vulnerability_count}`);
+
         // Set success/failure based on findings
         if (vulnerability_count > 0) {
-          core.setFailed(`🚨 ${vulnerability_count} security vulnerabilities found with severity ${severityThreshold} or higher. Total vulnerabilities: ${vulnerability_count}`);
+          core.setFailed(`🚨 ${vulnerability_count} security vulnerabilities found with severity ${severityThreshold} or higher`);
         } else {
-          core.info(`✅ No security vulnerabilities found with severity ${severityThreshold} or higher. Total vulnerabilities: ${vulnerability_count}`);
+          core.info(`✅ No security vulnerabilities found with severity ${severityThreshold} or higher`);
         }
       } else if (statusResponse.data.status === 'failed') {
         throw new Error('Scan failed: ' + statusResponse.data.error);
