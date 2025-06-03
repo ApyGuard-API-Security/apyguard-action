@@ -61,7 +61,7 @@ async function run() {
         // Get scan results
         const resultsResponse = await client.post(`/api/api_security/integrations/get_scan_results`, body);
         core.setOutput('Scan Results', JSON.stringify(resultsResponse.data.vulnerabilities));
-        
+        core.info('Scan Results: ' + JSON.stringify(resultsResponse.data.vulnerabilities));
         // Count only vulnerabilities that meet or exceed the threshold
         let vulnerability_count = 0;
         for (const [severity, count] of Object.entries(resultsResponse.data.vulnerabilities)) {
