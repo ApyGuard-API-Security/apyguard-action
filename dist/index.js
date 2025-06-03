@@ -102,9 +102,10 @@ function run() {
                     core.setOutput('Scan Results', JSON.stringify(resultsResponse.data.vulnerabilities));
                     // Count only vulnerabilities that meet or exceed the threshold
                     let vulnerability_count = 0;
+                    let total_vulnerability_count = 0;
                     const vulnerabilities = resultsResponse.data.vulnerabilities;
                     // Debug log to see what we're working with
-                    core.info(`Current severity threshold: ${severityThreshold} (value: ${thresholdValue})`);
+                    core.info(`Current severity threshold: ${severityThreshold}`);
                     core.info(`Vulnerabilities found: ${JSON.stringify(vulnerabilities)}`);
                     // Count vulnerabilities that meet or exceed threshold
                     for (const [severity, count] of Object.entries(vulnerabilities)) {
@@ -112,9 +113,10 @@ function run() {
                         if (severityValue >= thresholdValue) {
                             vulnerability_count += Number(count); // Ensure we're adding numbers
                         }
+                        total_vulnerability_count += Number(count);
                     }
                     // Debug log the final count
-                    core.info(`Total vulnerabilities meeting threshold: ${vulnerability_count}`);
+                    core.info(`Total vulnerabilities meeting threshold: ${vulnerability_count} out of ${total_vulnerability_count}`);
                     // Set success/failure based on findings
                     if (vulnerability_count > 0) {
                         core.setFailed(`🚨 ${vulnerability_count} security vulnerabilities found with severity ${severityThreshold} or higher`);
