@@ -40,6 +40,7 @@ async function run() {
     core.info('🚀 Starting ApyGuard scan...');
     const startResponse = await client.post('api/api_security/github_actions/start_scan', body);
     if (startResponse.status !== 200) {
+      core.info('🚨 Failed to start scan: ' + startResponse.status + ' ' + startResponse.statusText);
       throw new Error(`Failed to start scan: ${startResponse.status} ${startResponse.statusText}`);
     }
     else{
